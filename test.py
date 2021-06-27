@@ -6,7 +6,13 @@ from flask import Response
 
 def API1():
     '''Функция первого задания'''
-    r = redis.Redis(host='localhost', port=6379, db=0)
+    print('Первый API')
+    print('Введите хоста')
+    host = input()
+    print('Введите порт')
+    port = int(input())
+
+    r = redis.Redis(host=host, port=port)
 
     def chek_annagram(an1, an2):
         '''Проверяет на анаграмму слово, и возвращает True или False'''
@@ -24,16 +30,18 @@ def API1():
         return matches
 
     def json_answer(arg):
-        '''Везвращает json ответ'''
+        '''Везвращает json ответ с числом из Redis и говорит анаграмма ли это'''
         getted = int(r.get('schet'))
         matches = arg + ' анаграммма'
         result = json.dumps([matches,getted])
+        print(result)
         return result
 
     def last_function():
         '''Исполняющая функция'''
-        print()
+        print('Введите 1 слово')
         an1 = input()
+        print('Введите 2 слово')
         an2 = input()
         matches = chek_annagram(an1, an2)
         if matches == True:
@@ -44,7 +52,7 @@ def API1():
             arg = 'Не'
         return json_answer(arg)
 
-    return print('Api1 Ready'),last_function()
+    return last_function()
 API1()
 
 def API2():
@@ -83,11 +91,11 @@ def API2():
         cursor.execute("SELECT dev_type FROM devices LEFT JOIN endpoints on endpoints.device_id=devices.id WHERE endpoints.comment IS NULL GROUP BY devices.dev_type;")
         table = cursor.fetchall()
         len_table = len(table)
-        print(len_table)
         return len_table
 
     def insert_db():
         '''Функция внедряет в БД необходимые данные'''
+        print('Второй API')
         print('Введите dbname')
         dbname = input()
         print('Введите user')
@@ -118,7 +126,9 @@ def API2():
                     '''Для случайных 5 девайсов добовляем в endpoints значение endpoint'''
                     cursor.execute("INSERT INTO endpoints (device_id,comment) VALUES (%s,%s);", (x,(random.choice(enpoints))))
                     connect.commit()
-                    Response(status=201, mimetype='application/json'),'для device_id',x,'добавлено'
+                    '''Возможно что вернуть тут тоже не понял, вроде как HTTP response но я так и непонял
+                        как имеено это дожно работать'''
+                    print(Response(status=201, mimetype='application/json'),'для device_id',x,'добавлено')
                 except (Exception, psycopg2.Error) as error:
                     print('Не удалось добавить данные в БД в endpoints, код ошибки', error)
 
